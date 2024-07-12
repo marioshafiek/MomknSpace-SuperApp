@@ -15,7 +15,7 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useAuth } from "../contexts/AuthContext";
 import { useNavigate, useLocation } from "react-router-dom";
-import logo from "@assets/logo.svg";
+// import logo from "../assets/logo.svg";
 
 const loginSchema = z.object({
   email: z.string().email({ message: "Invalid email address" }),
@@ -73,7 +73,7 @@ const Login: React.FC = () => {
     >
       <Box w="400px" p="8" bg="white" boxShadow="lg" rounded="lg">
         <Box textAlign="center" mb="6">
-          <Image src={logo} alt="Logo" mx="auto" mb="4" />
+          {/* <Image src={logo} alt="Logo" mx="auto" mb="4" /> */}
           <Text fontSize="2xl">Login</Text>
         </Box>
         <form onSubmit={handleSubmit(onSubmit)}>
