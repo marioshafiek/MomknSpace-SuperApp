@@ -15,7 +15,7 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useAuth } from "../contexts/AuthContext";
 import { useNavigate, useLocation } from "react-router-dom";
-import logo from "../assets/logo.png"; // Adjust the path to your logo image
+import logo from "../assets/logo.png";
 
 const loginSchema = z.object({
   email: z.string().email({ message: "Invalid email address" }),
@@ -50,7 +50,7 @@ const Login: React.FC = () => {
         duration: 5000,
         isClosable: true,
       });
-      navigate("/", { replace: true });
+      navigate(from, { replace: true });
     } else {
       toast({
         title: "Login failed",
