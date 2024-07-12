@@ -19,7 +19,7 @@
     "bootstrap": "^5.3.3",
     "chakra-ui-search": "^1.1.1",
     "date-fns": "^3.6.0",
-    "framer-motion": "^11.2.12",
+    "framer-motion": "^6.0.0",  
     "react": "^18.2.0",
     "react-bootstrap": "^2.10.3",
     "react-dom": "^18.2.0",
