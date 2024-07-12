@@ -1,5 +1,5 @@
 import React, { ReactNode } from "react";
-import logo from "../../../assets/Logo.svg";
+import logo from "@assets/Logo.svg";
 import {
   IconButton,
   Box,

@@ -15,7 +15,7 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useAuth } from "../contexts/AuthContext";
 import { useNavigate, useLocation } from "react-router-dom";
-import logo from "../assets/logo.png";
+import logo from "@assets/logo.svg";
 
 const loginSchema = z.object({
   email: z.string().email({ message: "Invalid email address" }),
