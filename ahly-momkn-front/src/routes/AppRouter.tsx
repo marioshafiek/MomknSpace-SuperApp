@@ -55,7 +55,7 @@ const router = createBrowserRouter([
       { path: "/admin/services", element: <AdminServices /> },
       { path: "/admin/agent", element: <AdminAgent /> },
       { path: "/admin/reports", element: <AdminReports /> },
-      { path: "admin/reports/details", element: <ReportDetails /> },
+      { path: "/admin/report/details/:id", element: <ReportDetails /> },
     ],
   },
   { path: "/login", element: <Login /> },

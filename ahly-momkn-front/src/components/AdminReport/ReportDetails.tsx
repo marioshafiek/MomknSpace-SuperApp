@@ -1,54 +1,186 @@
-import React from "react";
-import { Box, Text, VStack, HStack, Button } from "@chakra-ui/react";
-import { useNavigate } from "react-router-dom";
-
-const reportDetails = {
-  customerName: "John Doe",
-  nid: "123456789",
-  phoneNumber: "123-456-7890",
-  email: "john@example.com",
-  serviceName: "Cleaning",
-  description: "House cleaning service",
-  fees: 50,
-  dateFrom: "2024-08-01",
-  dateTo: "2024-08-01",
-  timeFrom: "10:00 AM",
-  timeTo: "12:00 PM",
-  reserveDate: "2024-07-25",
-  reserveTime: "09:00 AM",
-};
+import React, { useEffect, useState } from "react";
+import {
+  Box,
+  Text,
+  VStack,
+  HStack,
+  Button,
+  Divider,
+  Flex,
+  Heading,
+  Stack,
+  Center,
+  Spinner,
+} from "@chakra-ui/react";
+import { useNavigate, useLocation } from "react-router-dom";
+import axios from "axios";
+import { format } from "date-fns";
 
 const ReportDetails: React.FC = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const details = location.state;
+
+  const [categoryName, setCategoryName] = useState<string>("");
+  const [providerName, setProviderName] = useState<string>("");
+  const [loading, setLoading] = useState<boolean>(true);
+
+  useEffect(() => {
+    const fetchCategory = async () => {
+      console.log(details.categoryId);
+      try {
+        const response = await axios.post(
+          "https://superapp-production.up.railway.app/getServiceCategoryById",
+          {
+            id: details.categoryId,
+          }
+        );
+        setCategoryName(response.data.data.categoryEnglishName);
+      } catch (error) {
+        console.error("Error fetching category:", error);
+      }
+    };
+
+    const fetchProviders = async () => {
+      console.log(details.providerId);
+      try {
+        const response = await axios.get(
+          "https://superapp-production.up.railway.app/ServiceProviders"
+        );
+        const provider = response.data.data.find(
+          (provider: { _id: string }) => provider._id === details.providerId
+        );
+        setProviderName(provider ? provider.spEnglishName : "Unknown");
+      } catch (error) {
+        console.error("Error fetching providers:", error);
+      }
+    };
+
+    const fetchData = async () => {
+      await fetchCategory();
+      await fetchProviders();
+      setLoading(false);
+    };
+
+    fetchData();
+  }, [details.categoryId, details.providerId]);
+
+  if (loading) {
+    return (
+      <Center h="100vh">
+        <Spinner size="xl" />
+      </Center>
+    );
+  }
+
+  const formatDate = (dateString: string) => {
+    if (!dateString) return "Unknown";
+    return format(new Date(dateString), "yyyy-MM-dd");
+  };
+
+  const formatTime = (dateString: string) => {
+    if (!dateString) return "Unknown";
+    return format(new Date(dateString), "HH:mm:ss");
+  };
 
   return (
-    <Box p={5}>
-      <Button mb={5} onClick={() => navigate("/admin/report")}>
+    <Box
+      p={5}
+      maxW="full"
+      mx="auto"
+      bg="white"
+      borderRadius="md"
+      boxShadow="md"
+    >
+      <Button mb={5} onClick={() => navigate(-1)} bg="#06B479" color={"white"}>
         Back
       </Button>
-      <VStack align="start" spacing={4}>
-        <Box>
-          <Text fontSize="xl" fontWeight="bold">
-            Customer Details
-          </Text>
-          <Text>Customer Name: {reportDetails.customerName}</Text>
-          <Text>NID: {reportDetails.nid}</Text>
-          <Text>Phone Number: {reportDetails.phoneNumber}</Text>
-          <Text>Email: {reportDetails.email}</Text>
+      <VStack align="start" spacing={6}>
+        <Heading as="h2" size="lg" mb={4}>
+          Report Details
+        </Heading>
+        <Box w="100%" p={4} bg="gray.50" borderRadius="md">
+          <Heading as="h3" size="md" mb={3}>
+            Consumer Details
+          </Heading>
+          <Divider mb={3} />
+          <Stack spacing={2}>
+            <Flex>
+              <Text fontWeight="bold" w="150px">
+                Consumer Name:
+              </Text>
+              <Text>{details.customerName}</Text>
+            </Flex>
+            <Flex>
+              <Text fontWeight="bold" w="150px">
+                Phone Number:
+              </Text>
+              <Text>{details.phoneNumber}</Text>
+            </Flex>
+          </Stack>
         </Box>
-        <Box>
-          <Text fontSize="xl" fontWeight="bold">
+        <Box w="100%" p={4} bg="gray.50" borderRadius="md">
+          <Heading as="h3" size="md" mb={3}>
             Service Details
-          </Text>
-          <Text>Service Name: {reportDetails.serviceName}</Text>
-          <Text>Description: {reportDetails.description}</Text>
-          <Text>Fees: ${reportDetails.fees}</Text>
-          <Text>Date From: {reportDetails.dateFrom}</Text>
-          <Text>Date To: {reportDetails.dateTo}</Text>
-          <Text>Time From: {reportDetails.timeFrom}</Text>
-          <Text>Time To: {reportDetails.timeTo}</Text>
-          <Text>Reserve Date: {reportDetails.reserveDate}</Text>
-          <Text>Reserve Time: {reportDetails.reserveTime}</Text>
+          </Heading>
+          <Divider mb={3} />
+          <Stack spacing={2}>
+            <Flex>
+              <Text fontWeight="bold" w="150px">
+                Service Name:
+              </Text>
+              <Text>{details.service}</Text>
+            </Flex>
+            <Flex>
+              <Text fontWeight="bold" w="150px">
+                Description:
+              </Text>
+              <Text>{details.serviceDescription}</Text>
+            </Flex>
+            <Flex>
+              <Text fontWeight="bold" w="150px">
+                Fees:
+              </Text>
+              <Text>${details.serviceFees}</Text>
+            </Flex>
+            <Flex>
+              <Text fontWeight="bold" w="150px">
+                Category Name:
+              </Text>
+              <Text>{categoryName}</Text>
+            </Flex>
+
+            <Flex direction="row">
+              <Text fontWeight="bold" w="150px">
+                Service From:
+              </Text>
+              <VStack align="start">
+                <Text>{formatDate(details.serviceFrom)}</Text>
+                <Text>{formatTime(details.serviceFrom)}</Text>
+              </VStack>
+            </Flex>
+            <Flex direction="row">
+              <Text fontWeight="bold" w="150px">
+                Service To:
+              </Text>
+              <VStack align="start">
+                <Text>{formatDate(details.serviceTo)}</Text>
+                <Text>{formatTime(details.serviceTo)}</Text>
+              </VStack>
+            </Flex>
+            <Flex direction="column">
+              <Text fontWeight="bold" w="150px">
+                Date:
+              </Text>
+              <Text>{details.reserveDate}</Text>
+            </Flex>
+            <Flex direction="column">
+              <Text fontWeight="bold" w="150px">
+                Time:
+              </Text>
+              <Text>{details.reserveTime}</Text>
+            </Flex>
+          </Stack>
         </Box>
       </VStack>
     </Box>

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import {
   Table,
   Thead,
@@ -14,95 +14,33 @@ import TablePagination from "../AdminCateogry/TablePagination"; // Adjust the im
 import { useNavigate } from "react-router-dom";
 
 interface ReportData {
-  id: number;
+  id: string;
   customerName: string;
+  phoneNumber: string;
   service: string;
+  serviceDescription: string;
+  serviceFees: number;
+  categoryId: string;
+  providerId: string;
   reserveDate: string;
-  fees: number;
+  reserveTime: string;
+  serviceFrom: string;
+  serviceTo: string;
 }
 
-const initialData: ReportData[] = [
-  {
-    id: 1,
-    customerName: "John Doe",
-    service: "Cleaning",
-    reserveDate: "2024-08-01",
-    fees: 50,
-  },
-  {
-    id: 2,
-    customerName: "Jane Smith",
-    service: "Plumbing",
-    reserveDate: "2024-08-02",
-    fees: 75,
-  },
-  {
-    id: 3,
-    customerName: "Alice Johnson",
-    service: "Electrician",
-    reserveDate: "2024-08-03",
-    fees: 100,
-  },
-  {
-    id: 4,
-    customerName: "Bob Brown",
-    service: "Gardening",
-    reserveDate: "2024-08-04",
-    fees: 60,
-  },
-  {
-    id: 5,
-    customerName: "Charlie Davis",
-    service: "Car Wash",
-    reserveDate: "2024-08-05",
-    fees: 40,
-  },
-  {
-    id: 6,
-    customerName: "Diana Evans",
-    service: "Dog Walking",
-    reserveDate: "2024-08-06",
-    fees: 30,
-  },
-  {
-    id: 7,
-    customerName: "Edward Frank",
-    service: "Window Cleaning",
-    reserveDate: "2024-08-07",
-    fees: 70,
-  },
-  {
-    id: 8,
-    customerName: "Fiona Green",
-    service: "House Cleaning",
-    reserveDate: "2024-08-08",
-    fees: 90,
-  },
-  {
-    id: 9,
-    customerName: "George Hill",
-    service: "Painting",
-    reserveDate: "2024-08-09",
-    fees: 110,
-  },
-  {
-    id: 10,
-    customerName: "Hannah Irvine",
-    service: "Tutoring",
-    reserveDate: "2024-08-10",
-    fees: 50,
-  },
-];
+interface ReportTableProps {
+  data: ReportData[];
+  onRemoveBooking: (id: string) => void;
+}
 
-const ReportTable: React.FC = () => {
-  const [data, setData] = useState(initialData);
-  const [currentPage, setCurrentPage] = useState(1);
+const ReportTable: React.FC<ReportTableProps> = ({ data, onRemoveBooking }) => {
+  const [currentPage, setCurrentPage] = React.useState(1);
   const itemsPerPage = 5;
   const totalPages = Math.ceil(data.length / itemsPerPage);
   const navigate = useNavigate();
 
-  const handleConfirm = (id: number) => {
-    setData(data.filter((item) => item.id !== id));
+  const handleConfirm = (id: string) => {
+    onRemoveBooking(id);
   };
 
   const currentData = data.slice(
@@ -116,8 +54,10 @@ const ReportTable: React.FC = () => {
         <Thead>
           <Tr>
             <Th>Customer Name</Th>
+            <Th>Phone Number</Th>
             <Th>Service</Th>
             <Th>Reserve Date</Th>
+            <Th>Reserve Time</Th>
             <Th>Fees</Th>
             <Th>Confirm Service</Th>
             <Th>Details</Th>
@@ -127,9 +67,11 @@ const ReportTable: React.FC = () => {
           {currentData.map((row) => (
             <Tr key={row.id}>
               <Td>{row.customerName}</Td>
+              <Td>{row.phoneNumber}</Td>
               <Td>{row.service}</Td>
               <Td>{row.reserveDate}</Td>
-              <Td>${row.fees}</Td>
+              <Td>{row.reserveTime}</Td>
+              <Td>${row.serviceFees}</Td>
               <Td>
                 <Button
                   bg="#06B479"
@@ -142,7 +84,11 @@ const ReportTable: React.FC = () => {
               <Td>
                 <Link
                   color="#06B479"
-                  onClick={() => navigate(`admin/reports/details`)}
+                  onClick={() =>
+                    navigate(`/admin/report/details/${row.id}`, {
+                      state: { ...row },
+                    })
+                  }
                 >
                   See More
                 </Link>
