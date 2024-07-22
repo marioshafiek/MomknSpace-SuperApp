@@ -2,14 +2,19 @@ import React, { useState, useEffect } from "react";
 import { Box, Text, Flex, Button, Spinner, Center } from "@chakra-ui/react";
 import Table from "@components/AdminCateogry/CateogryTable";
 import TablePagination from "@components/AdminCateogry/TablePagination";
-import MultiStepModal from "@components/AdminCateogry/MultiStepModal";
+import MultiStepModal from "@components/AdminCateogry/CateogryModal";
+import EditCategoryModal from "@components/AdminCateogry/EditCategoryModal";
+import Swal from "sweetalert2";
 import { Category } from "../types"; // Define a Category type
+import axios from "axios";
 
 const AdminCategory: React.FC = () => {
   const [categories, setCategories] = useState<Category[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isLoading, setIsLoading] = useState(true); // State to manage loading
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [editCategory, setEditCategory] = useState<Category | null>(null);
   const itemsPerPage = 8;
 
   const fetchCategories = async () => {
@@ -43,13 +48,14 @@ const AdminCategory: React.FC = () => {
           const numberOfProviders = providerData.totalProviders || 0;
 
           return {
+            id: category._id,
             category: category.categoryEnglishName,
             categoryArabicName: category.categoryArabicName,
             numberOfProviders: numberOfProviders,
             numberOfServices: serviceCount,
             serviceAgent: "N/A",
             status: category.active ? "active" : "inactive",
-            image: category.image.secure_url, // Add image URL
+            image: category.image.secure_url,
           };
         })
       );
@@ -58,7 +64,7 @@ const AdminCategory: React.FC = () => {
     } catch (error) {
       console.error("Error fetching categories:", error);
     } finally {
-      setIsLoading(false); // Set loading to false after data is fetched
+      setIsLoading(false);
     }
   };
 
@@ -76,6 +82,47 @@ const AdminCategory: React.FC = () => {
   const handleSave = () => {
     fetchCategories();
     setIsModalOpen(false);
+    setIsEditModalOpen(false);
+  };
+
+  const handleDelete = async (id: string) => {
+    try {
+      console.log(id);
+      const formData = new FormData();
+      formData.append("categoryId", id);
+      const response = await axios.delete(
+        "https://superapp-production.up.railway.app/deleteServiceCategory",
+        {
+          data: {
+            categoryId: id,
+          },
+        }
+      );
+      if (response) {
+        Swal.fire({
+          title: "Success",
+          text: "Category deleted successfully",
+          icon: "success",
+          confirmButtonText: "OK",
+        });
+        handleSave();
+      } else {
+        Swal.fire({
+          title: "Error",
+          text: "There was an error deleting the category",
+          icon: "error",
+          confirmButtonText: "OK",
+        });
+      }
+    } catch (error) {
+      Swal.fire({
+        title: "Error",
+        text: "There was an error deleting the category",
+        icon: "error",
+        confirmButtonText: "OK",
+      });
+      console.error("Error deleting category", error);
+    }
   };
 
   return (
@@ -107,7 +154,13 @@ const AdminCategory: React.FC = () => {
               "Number of Providers",
               "Number of Services",
               "Status",
+              "Actions",
             ]}
+            onDelete={handleDelete}
+            onEdit={(category) => {
+              setEditCategory(category);
+              setIsEditModalOpen(true);
+            }}
           />
           <TablePagination
             totalPages={totalPages}
@@ -122,6 +175,15 @@ const AdminCategory: React.FC = () => {
         onClose={() => setIsModalOpen(false)}
         onSave={handleSave}
       />
+
+      {editCategory && (
+        <EditCategoryModal
+          isOpen={isEditModalOpen}
+          onClose={() => setIsEditModalOpen(false)}
+          onSave={handleSave}
+          initialData={editCategory}
+        />
+      )}
     </Box>
   );
 };

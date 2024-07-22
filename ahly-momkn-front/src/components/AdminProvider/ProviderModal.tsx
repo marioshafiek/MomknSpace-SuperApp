@@ -14,8 +14,8 @@ import {
   VStack,
   HStack,
   Select,
-  useToast,
   Text,
+  useToast,
 } from "@chakra-ui/react";
 import { useForm, Controller } from "react-hook-form";
 import axios from "axios";
@@ -37,12 +37,14 @@ interface ProvidersModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSave: (data: ProviderFormData) => void;
+  initialData?: ProviderFormData | null; // Add initialData prop
 }
 
 const ProvidersModal: React.FC<ProvidersModalProps> = ({
   isOpen,
   onClose,
   onSave,
+  initialData = null, // Default to null if not provided
 }) => {
   const { control, handleSubmit, reset, setValue, watch } =
     useForm<ProviderFormData>({
@@ -74,24 +76,40 @@ const ProvidersModal: React.FC<ProvidersModalProps> = ({
     fetchCategories();
   }, []);
 
+  useEffect(() => {
+    if (initialData) {
+      setValue("spEnglishName", initialData.spEnglishName);
+      setValue("spArabicName", initialData.spArabicName);
+      setValue("active", initialData.active);
+      setValue("categoryId", initialData.categoryId);
+    }
+  }, [initialData, setValue]);
+
   const onSubmit = async (data: ProviderFormData) => {
-    console.log(data);
     try {
       setIsLoading(true);
-      await axios.post(
-        "https://superapp-production.up.railway.app/createServiceProvider",
-        {
-          spEnglishName: data.spEnglishName,
-          spArabicName: data.spArabicName,
-          active: data.active,
-          categoryId: data.categoryId,
-        }
-      );
-      console.log(data.categoryId);
+      const url = initialData
+        ? "https://superapp-production.up.railway.app/updateServiceProvider"
+        : "https://superapp-production.up.railway.app/createServiceProvider";
+      const method = initialData ? "PUT" : "POST";
+
+      const payload = {
+        ...data,
+        id: initialData ? initialData.categoryId : undefined,
+      };
+      console.log(payload);
+      const response = await axios({
+        method,
+        url,
+        data: payload,
+      });
+      console.log(response.data.message);
 
       Swal.fire({
         title: "Success",
-        text: "Service provider added successfully.",
+        text: `Service provider ${
+          initialData ? "updated" : "added"
+        } successfully.`,
         icon: "success",
         confirmButtonText: "OK",
       });
@@ -100,10 +118,12 @@ const ProvidersModal: React.FC<ProvidersModalProps> = ({
       onClose();
       reset();
     } catch (error) {
-      console.error("Error adding service provider:", error);
+      console.error("Error saving service provider:", error);
       Swal.fire({
         title: "Error",
-        text: "There was an error adding the service provider.",
+        text: `There was an error ${
+          initialData ? "updating" : "adding"
+        } the service provider.`,
         icon: "error",
         confirmButtonText: "OK",
       });
@@ -116,7 +136,9 @@ const ProvidersModal: React.FC<ProvidersModalProps> = ({
     <Modal isOpen={isOpen} onClose={onClose} size="md" isCentered>
       <ModalOverlay />
       <ModalContent>
-        <ModalHeader>Add Service Provider</ModalHeader>
+        <ModalHeader>
+          {initialData ? "Edit Service Provider" : "Add Service Provider"}
+        </ModalHeader>
         <ModalCloseButton />
         <ModalBody>
           <form onSubmit={handleSubmit(onSubmit)}>

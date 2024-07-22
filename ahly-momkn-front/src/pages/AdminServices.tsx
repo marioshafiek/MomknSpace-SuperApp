@@ -4,19 +4,8 @@ import axios from "axios";
 import ServicesTable from "@components/AdminServices/ServiceTable";
 import TablePagination from "@components/AdminCateogry/TablePagination";
 import ServicesModal from "@components/AdminServices/ServiceModal";
-
-interface Service {
-  serviceName: string;
-  description: string;
-  provider: string;
-  category: string;
-  type: string;
-  fees: number;
-  from: string | null;
-  to: string | null;
-  status: string;
-  image: string;
-}
+import { Service } from "../types"; // Make sure this is correct
+import Swal from "sweetalert2";
 
 interface Provider {
   id: string;
@@ -70,7 +59,9 @@ const AdminServices: React.FC = () => {
   const [categories, setCategories] = useState<Category[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [editService, setEditService] = useState<Service | null>(null);
   const itemsPerPage = 8;
 
   const fetchProvidersAndCategories = async () => {
@@ -118,6 +109,7 @@ const AdminServices: React.FC = () => {
           const categoryName = await fetchCategoryName(service.categoryId);
 
           return {
+            _id: service._id,
             serviceName: service.name,
             description: service.description,
             provider: providerName,
@@ -155,6 +147,37 @@ const AdminServices: React.FC = () => {
   const handleSave = () => {
     fetchServices();
     setIsModalOpen(false);
+    setIsEditModalOpen(false);
+  };
+
+  const handleDelete = async (serviceId: string) => {
+    try {
+      console.log(serviceId);
+      const response = await axios.delete(
+        "https://superapp-production.up.railway.app/deleteService",
+        {
+          data: {
+            serviceId: serviceId,
+          },
+        }
+      );
+      console.log("Deleted Service");
+      Swal.fire({
+        title: "Deleted!",
+        text: "The service has been deleted.",
+        icon: "success",
+        confirmButtonText: "OK",
+      });
+      fetchServices();
+    } catch (error) {
+      Swal.fire({
+        title: "Error!",
+        text: "There was an error deleting the service provider.",
+        icon: "error",
+        confirmButtonText: "OK",
+      });
+      console.error("Error deleting service:", error);
+    }
   };
 
   return (
@@ -186,7 +209,13 @@ const AdminServices: React.FC = () => {
               "From",
               "To",
               "Status",
+              "Actions",
             ]}
+            onEdit={(service) => {
+              setEditService(service);
+              setIsEditModalOpen(true);
+            }}
+            onDelete={handleDelete}
           />
           <TablePagination
             totalPages={totalPages}
@@ -203,6 +232,16 @@ const AdminServices: React.FC = () => {
         providers={providers}
         categories={categories}
       />
+
+      {editService && (
+        <ServicesModal
+          isOpen={isEditModalOpen}
+          onClose={() => setIsEditModalOpen(false)}
+          onSave={handleSave}
+          providers={providers}
+          categories={categories}
+        />
+      )}
     </Box>
   );
 };

@@ -8,14 +8,18 @@ import {
   Td,
   Badge,
   TableCaption,
+  IconButton,
+  HStack,
 } from "@chakra-ui/react";
+import { FaTrash } from "react-icons/fa";
 
 interface Props {
   data: any[];
   columns: string[];
+  onDelete: (id: string) => void;
 }
 
-const ServiceAgentsTable: React.FC<Props> = ({ data, columns }) => {
+const ServiceAgentsTable: React.FC<Props> = ({ data, columns, onDelete }) => {
   return (
     <Table variant="simple">
       <TableCaption>Service Agent</TableCaption>
@@ -47,6 +51,15 @@ const ServiceAgentsTable: React.FC<Props> = ({ data, columns }) => {
               <Badge colorScheme={row.state === "active" ? "green" : "red"}>
                 {row.state}
               </Badge>
+            </Td>
+            <Td>
+              <HStack spacing={2}>
+                <IconButton
+                  aria-label="Delete agent"
+                  icon={<FaTrash />}
+                  onClick={() => onDelete(row._id)}
+                />
+              </HStack>
             </Td>
           </Tr>
         ))}

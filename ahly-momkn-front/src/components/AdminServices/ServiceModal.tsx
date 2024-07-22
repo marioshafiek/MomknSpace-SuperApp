@@ -101,7 +101,10 @@ const ServicesModal: React.FC<ServicesModalProps> = ({
     formData.append("fees", data.fees);
     formData.append("code", data.code);
     formData.append("description", data.description);
-    formData.append("type", data.type);
+    if (data.type != "non-scheduled") {
+      formData.append("type", data.type);
+    }
+
     formData.append("state", data.active ? "active" : "locked");
     if (data.type === "scheduled") {
       formData.append("from", formatDateTime(data.from));
@@ -284,7 +287,7 @@ const ServicesModal: React.FC<ServicesModalProps> = ({
                   render={({ field }) => (
                     <Select placeholder="Select type" {...field}>
                       <option value="scheduled">Scheduled</option>
-                      <option value="non-scheduled">Non-Scheduled</option>
+                      <option value="not_scheduled">Non-Scheduled</option>
                       <option value="agent">Agent</option>
                     </Select>
                   )}

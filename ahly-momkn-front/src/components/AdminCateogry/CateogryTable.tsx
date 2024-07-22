@@ -12,15 +12,20 @@ import {
   Badge,
   Image,
   HStack,
+  Button,
+  IconButton,
 } from "@chakra-ui/react";
-import { Category } from "../../types"; // Define a Category type
+import { Category } from "../../types";
+import { FaEdit, FaTrash } from "react-icons/fa";
 
 interface TableProps {
   data: Category[];
   columns: string[];
+  onDelete: (id: string) => void;
+  onEdit: (category: Category) => void;
 }
 
-const Table: React.FC<TableProps> = ({ data, columns }) => {
+const Table: React.FC<TableProps> = ({ data, columns, onDelete, onEdit }) => {
   return (
     <TableContainer>
       <ChakraTable variant="simple">
@@ -42,7 +47,7 @@ const Table: React.FC<TableProps> = ({ data, columns }) => {
                     objectFit="cover"
                     src={item.image}
                     alt={item.category}
-                    borderRadius="full" // Make the image circular
+                    borderRadius="full"
                   />
                   <Box>{item.category}</Box>
                 </HStack>
@@ -54,6 +59,20 @@ const Table: React.FC<TableProps> = ({ data, columns }) => {
                 <Badge colorScheme={item.status === "active" ? "green" : "red"}>
                   {item.status}
                 </Badge>
+              </Td>
+              <Td>
+                <HStack spacing={2}>
+                  <IconButton
+                    aria-label="Edit Category"
+                    icon={<FaEdit />}
+                    onClick={() => onEdit(item)}
+                  />
+                  <IconButton
+                    aria-label="Delete Category"
+                    icon={<FaTrash />}
+                    onClick={() => onDelete(item.id)}
+                  />
+                </HStack>
               </Td>
             </Tr>
           ))}

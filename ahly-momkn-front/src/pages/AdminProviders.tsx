@@ -4,6 +4,7 @@ import ProvidersTable from "@components/AdminProvider/ProvidersTable";
 import TablePagination from "@components/AdminCateogry/TablePagination";
 import ProvidersModal from "@components/AdminProvider/ProviderModal";
 import axios from "axios";
+import Swal from "sweetalert2";
 
 interface Provider {
   _id: string;
@@ -27,7 +28,7 @@ const fetchProviders = async () => {
     const response = await axios.get(
       "https://superapp-production.up.railway.app/ServiceProviders"
     );
-    console.log("Providers Response:", response.data.data);
+
     return response.data.data;
   } catch (error) {
     console.error("Error fetching providers:", error);
@@ -46,7 +47,6 @@ const fetchCategoryById = async (categoryId: string): Promise<string> => {
         },
       }
     );
-    console.log("Category Response:", response.data);
     return response.data.data.categoryEnglishName || "Unknown Category";
   } catch (error) {
     console.error("Error fetching category name:", error);
@@ -58,7 +58,10 @@ const AdminProviders: React.FC = () => {
   const [providers, setProviders] = useState<Provider[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [editProvider, setEditProvider] = useState<Provider | null>(null);
+  const [deleting, setDeleting] = useState(false);
   const itemsPerPage = 8;
 
   const fetchProvidersAndCategories = async () => {
@@ -83,7 +86,6 @@ const AdminProviders: React.FC = () => {
 
   useEffect(() => {
     fetchProvidersAndCategories();
-    console.log(providers);
   }, []);
 
   const totalPages = Math.ceil(providers.length / itemsPerPage);
@@ -94,9 +96,42 @@ const AdminProviders: React.FC = () => {
   );
 
   const handleSave = (data: ProviderFormData) => {
-    console.log(data.spEnglishName);
     setIsModalOpen(false);
+    setIsEditModalOpen(false);
     fetchProvidersAndCategories(); // Refresh data after save
+  };
+
+  const handleDelete = async (providerId: string) => {
+    setDeleting(true);
+    try {
+      const response = await axios.delete(
+        "https://superapp-production.up.railway.app/deleteServiceProvider",
+        {
+          data: {
+            providerId: providerId,
+          },
+        }
+      );
+
+      Swal.fire({
+        title: "Deleted!",
+        text: "The service provider has been deleted.",
+        icon: "success",
+        confirmButtonText: "OK",
+      });
+
+      fetchProvidersAndCategories();
+    } catch (error) {
+      Swal.fire({
+        title: "Error!",
+        text: "There was an error deleting the service provider.",
+        icon: "error",
+        confirmButtonText: "OK",
+      });
+      console.error("Error deleting provider:", error);
+    } finally {
+      setDeleting(false);
+    }
   };
 
   return (
@@ -110,7 +145,7 @@ const AdminProviders: React.FC = () => {
         </Button>
       </Flex>
 
-      {isLoading ? (
+      {isLoading || deleting ? (
         <Center>
           <Spinner size="xl" />
         </Center>
@@ -123,7 +158,13 @@ const AdminProviders: React.FC = () => {
               "Service Provider (Arabic)",
               "Category",
               "Status",
+              "Actions",
             ]}
+            onEdit={(provider) => {
+              setEditProvider(provider);
+              setIsEditModalOpen(true);
+            }}
+            onDelete={handleDelete}
           />
           <TablePagination
             totalPages={totalPages}
@@ -138,6 +179,15 @@ const AdminProviders: React.FC = () => {
         onClose={() => setIsModalOpen(false)}
         onSave={handleSave}
       />
+
+      {editProvider && (
+        <ProvidersModal
+          isOpen={isEditModalOpen}
+          onClose={() => setIsEditModalOpen(false)}
+          onSave={handleSave}
+          initialData={editProvider}
+        />
+      )}
     </Box>
   );
 };

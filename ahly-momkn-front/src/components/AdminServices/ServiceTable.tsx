@@ -10,29 +10,26 @@ import {
   Badge,
   TableCaption,
   Image,
-  Text,
+  HStack,
+  IconButton,
 } from "@chakra-ui/react";
 import { format } from "date-fns";
-
-interface Service {
-  serviceName: string;
-  description: string;
-  provider: string;
-  category: string;
-  type: string;
-  fees: number;
-  from: string | null;
-  to: string | null;
-  status: string;
-  image: string;
-}
+import { FaEdit, FaTrash } from "react-icons/fa";
+import { Service } from "../../types"; // Make sure this is correct
 
 interface TableProps {
   data: Service[];
   columns: string[];
+  onEdit: (service: Service) => void;
+  onDelete: (serviceId: string) => void;
 }
 
-const ServicesTable: React.FC<TableProps> = ({ data, columns }) => {
+const ServicesTable: React.FC<TableProps> = ({
+  data,
+  columns,
+  onEdit,
+  onDelete,
+}) => {
   return (
     <Box overflowX="auto">
       <Table variant="simple">
@@ -70,6 +67,20 @@ const ServicesTable: React.FC<TableProps> = ({ data, columns }) => {
                 <Badge colorScheme={row.status === "active" ? "green" : "red"}>
                   {row.status}
                 </Badge>
+              </Td>
+              <Td>
+                <HStack spacing={2}>
+                  <IconButton
+                    aria-label="Edit Service"
+                    icon={<FaEdit />}
+                    onClick={() => onEdit(row)}
+                  />
+                  <IconButton
+                    aria-label="Delete Service"
+                    icon={<FaTrash />}
+                    onClick={() => onDelete(row._id)}
+                  />
+                </HStack>
               </Td>
             </Tr>
           ))}

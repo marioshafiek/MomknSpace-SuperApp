@@ -22,7 +22,7 @@ interface MultiStepModalProps {
   onSave: () => void;
 }
 
-const MultiStepModal: React.FC<MultiStepModalProps> = ({
+const CateogryModal: React.FC<MultiStepModalProps> = ({
   isOpen,
   onClose,
   onSave,
@@ -167,4 +167,4 @@ const MultiStepModal: React.FC<MultiStepModalProps> = ({
   );
 };
 
-export default MultiStepModal;
+export default CateogryModal;

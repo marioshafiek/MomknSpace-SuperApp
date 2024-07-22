@@ -4,6 +4,7 @@ import Table from "@components/AdminAgent/ServiceAgentsTable";
 import TablePagination from "@components/AdminCateogry/TablePagination";
 import ServiceAgentsModal from "@components/AdminAgent/ServiceAgentsModal";
 import axios from "axios";
+import Swal from "sweetalert2";
 
 interface Agent {
   _id: string;
@@ -27,6 +28,7 @@ const fetchAgents = async () => {
     const response = await axios.get(
       "https://superapp-production.up.railway.app/getallServiceAgent"
     );
+    console.log(response.data.data);
     return response.data.data;
   } catch (error) {
     console.error("Error fetching agents:", error);
@@ -97,6 +99,45 @@ const AdminAgent: React.FC = () => {
     fetchAgentsAndServices();
   };
 
+  const handleDelete = async (id: string) => {
+    try {
+      console.log(id);
+      const response = await axios.delete(
+        "https://superapp-production.up.railway.app/deleteAgent",
+        {
+          data: {
+            id: id,
+          },
+        }
+      );
+
+      if (response) {
+        Swal.fire({
+          title: "Success",
+          text: "Service agent deleted successfully.",
+          icon: "success",
+          confirmButtonText: "OK",
+        });
+        fetchAgentsAndServices();
+      } else {
+        Swal.fire({
+          title: "Error",
+          text: "There was an error deleting the service agent.",
+          icon: "error",
+          confirmButtonText: "OK",
+        });
+      }
+    } catch (error) {
+      Swal.fire({
+        title: "Error",
+        text: "There was an error deleting the service agent.",
+        icon: "error",
+        confirmButtonText: "OK",
+      });
+      console.error("Error deleting service agent", error);
+    }
+  };
+
   return (
     <Box p={5}>
       <Flex justifyContent="space-between" alignItems="center" mb={5}>
@@ -124,7 +165,9 @@ const AdminAgent: React.FC = () => {
               "Fees",
               "Has Calendar",
               "Status",
+              "Actions",
             ]}
+            onDelete={handleDelete}
           />
           <TablePagination
             totalPages={totalPages}
