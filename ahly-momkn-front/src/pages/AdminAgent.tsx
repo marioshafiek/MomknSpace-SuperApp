@@ -5,6 +5,7 @@ import TablePagination from "@components/AdminCateogry/TablePagination";
 import ServiceAgentsModal from "@components/AdminAgent/ServiceAgentsModal";
 import axios from "axios";
 import Swal from "sweetalert2";
+import { useSearch } from "../SearchContext";
 
 interface Agent {
   _id: string;
@@ -28,7 +29,6 @@ const fetchAgents = async () => {
     const response = await axios.get(
       "https://superapp-production.up.railway.app/getallServiceAgent"
     );
-    console.log(response.data.data);
     return response.data.data;
   } catch (error) {
     console.error("Error fetching agents:", error);
@@ -54,6 +54,7 @@ const AdminAgent: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const { searchQuery } = useSearch();
   const itemsPerPage = 8;
 
   const fetchAgentsAndServices = async () => {
@@ -92,16 +93,22 @@ const AdminAgent: React.FC = () => {
     currentPage * itemsPerPage
   );
 
+  const filteredData = agents.filter(
+    (agent) =>
+      agent.agentEnglishName
+        .toLowerCase()
+        .includes(searchQuery.toLowerCase()) ||
+      agent.agentArabicName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      agent.serviceName.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   const handleSave = (data: any) => {
-    console.log(services);
-    console.log(data);
     setIsModalOpen(false);
     fetchAgentsAndServices();
   };
 
   const handleDelete = async (id: string) => {
     try {
-      console.log(id);
       const response = await axios.delete(
         "https://superapp-production.up.railway.app/deleteAgent",
         {
@@ -156,7 +163,7 @@ const AdminAgent: React.FC = () => {
       ) : (
         <Box bg="white" p={5} rounded="lg" boxShadow="md" overflowX="auto">
           <Table
-            data={currentData}
+            data={filteredData}
             columns={[
               "Agent English Name",
               "Agent Arabic Name",

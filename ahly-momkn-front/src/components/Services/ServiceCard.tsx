@@ -16,6 +16,7 @@ interface ServiceCardProps {
   badgeText: string;
   description: string;
   serviceFees: number;
+  type: string;
   onReserve: (selectedTime: string, selectedDate: string) => void;
 }
 
@@ -24,6 +25,7 @@ const ServiceCard: React.FC<ServiceCardProps> = ({
   badgeText,
   description,
   serviceFees,
+  type,
   onReserve,
 }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -74,6 +76,7 @@ const ServiceCard: React.FC<ServiceCardProps> = ({
       <ReserveModal
         isOpen={isOpen}
         onClose={onClose}
+        type={type}
         title={title}
         description={description}
         serviceFees={serviceFees}

@@ -5,6 +5,7 @@ import TablePagination from "@components/AdminCateogry/TablePagination";
 import ProvidersModal from "@components/AdminProvider/ProviderModal";
 import axios from "axios";
 import Swal from "sweetalert2";
+import { useSearch } from "../SearchContext";
 
 interface Provider {
   _id: string;
@@ -28,7 +29,6 @@ const fetchProviders = async () => {
     const response = await axios.get(
       "https://superapp-production.up.railway.app/ServiceProviders"
     );
-
     return response.data.data;
   } catch (error) {
     console.error("Error fetching providers:", error);
@@ -64,6 +64,8 @@ const AdminProviders: React.FC = () => {
   const [deleting, setDeleting] = useState(false);
   const itemsPerPage = 8;
 
+  const { searchQuery } = useSearch();
+
   const fetchProvidersAndCategories = async () => {
     setIsLoading(true);
     try {
@@ -93,6 +95,16 @@ const AdminProviders: React.FC = () => {
   const currentData = providers.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
+  );
+
+  const filteredData = providers.filter(
+    (provider) =>
+      provider.spEnglishName
+        .toLowerCase()
+        .includes(searchQuery.toLowerCase()) ||
+      provider.spArabicName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (provider.categoryName &&
+        provider.categoryName.toLowerCase().includes(searchQuery.toLowerCase()))
   );
 
   const handleSave = (data: ProviderFormData) => {
@@ -152,7 +164,7 @@ const AdminProviders: React.FC = () => {
       ) : (
         <Box bg="white" p={5} rounded="lg" boxShadow="md" overflowX="auto">
           <ProvidersTable
-            data={currentData}
+            data={filteredData}
             columns={[
               "Service Provider (English)",
               "Service Provider (Arabic)",

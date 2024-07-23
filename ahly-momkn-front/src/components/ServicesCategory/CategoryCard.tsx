@@ -1,4 +1,3 @@
-// src/components/ServiceCategoryCard.tsx
 import React from "react";
 import { Box, Image, Text, VStack } from "@chakra-ui/react";
 import { Link } from "react-router-dom";
@@ -6,7 +5,7 @@ import { Link } from "react-router-dom";
 interface ServiceCategoryCardProps {
   imageSrc: string;
   title: string;
-  categoryId: number;
+  categoryId: string;
 }
 
 const ServiceCategoryCard: React.FC<ServiceCategoryCardProps> = ({
@@ -15,7 +14,7 @@ const ServiceCategoryCard: React.FC<ServiceCategoryCardProps> = ({
   categoryId,
 }) => {
   return (
-    <Link to={`/category/${categoryId}`}>
+    <Link to={`/category/${categoryId}/providers`}>
       <Box
         width="350px"
         height="300px"

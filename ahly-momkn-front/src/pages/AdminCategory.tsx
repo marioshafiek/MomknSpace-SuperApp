@@ -7,6 +7,7 @@ import EditCategoryModal from "@components/AdminCateogry/EditCategoryModal";
 import Swal from "sweetalert2";
 import { Category } from "../types"; // Define a Category type
 import axios from "axios";
+import { useSearch } from "../SearchContext";
 
 const AdminCategory: React.FC = () => {
   const [categories, setCategories] = useState<Category[]>([]);
@@ -16,6 +17,8 @@ const AdminCategory: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [editCategory, setEditCategory] = useState<Category | null>(null);
   const itemsPerPage = 8;
+
+  const { searchQuery } = useSearch();
 
   const fetchCategories = async () => {
     setIsLoading(true);
@@ -79,6 +82,12 @@ const AdminCategory: React.FC = () => {
     currentPage * itemsPerPage
   );
 
+  const filteredData = currentData.filter(
+    (data) =>
+      data.category.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      data.categoryArabicName.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   const handleSave = () => {
     fetchCategories();
     setIsModalOpen(false);
@@ -129,7 +138,7 @@ const AdminCategory: React.FC = () => {
     <Box p={5}>
       <Flex justifyContent="space-between" alignItems="center" mb={5}>
         <Text fontSize="2xl" fontWeight="bold">
-          {categories.length} Service Category
+          {filteredData.length} Service Category
         </Text>
         <Button
           bg={"#06B479"}
@@ -147,7 +156,7 @@ const AdminCategory: React.FC = () => {
       ) : (
         <Box bg="white" p={5} rounded="lg" boxShadow="md" overflowX="auto">
           <Table
-            data={currentData}
+            data={filteredData}
             columns={[
               "Category Name",
               "Category Name (Arabic)",

@@ -2,21 +2,21 @@ import React from "react";
 import { Badge, Box, Image, Text, VStack } from "@chakra-ui/react";
 import { Link } from "react-router-dom";
 
-interface ServiceCategoryCardProps {
+interface ProviderCardProps {
   imageSrc: string;
   title: string;
-  providerId: number;
+  providerId: string;
   status: string;
 }
 
-const ProviderCard: React.FC<ServiceCategoryCardProps> = ({
+const ProviderCard: React.FC<ProviderCardProps> = ({
   imageSrc,
   title,
   providerId,
   status,
 }) => {
   return (
-    <Link to={`/category/${providerId}/services`}>
+    <Link to={`/services/${providerId}`}>
       <Box
         width="250px"
         height="400px"

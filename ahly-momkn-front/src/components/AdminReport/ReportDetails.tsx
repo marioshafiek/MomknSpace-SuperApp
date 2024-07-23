@@ -75,12 +75,22 @@ const ReportDetails: React.FC = () => {
 
   const formatDate = (dateString: string) => {
     if (!dateString) return "Unknown";
-    return format(new Date(dateString), "yyyy-MM-dd");
+    try {
+      return format(new Date(dateString), "yyyy-MM-dd");
+    } catch (error) {
+      console.error("Invalid date value:", dateString);
+      return "Invalid date";
+    }
   };
 
   const formatTime = (dateString: string) => {
     if (!dateString) return "Unknown";
-    return format(new Date(dateString), "HH:mm:ss");
+    try {
+      return format(new Date(dateString), "HH:mm:ss");
+    } catch (error) {
+      console.error("Invalid time value:", dateString);
+      return "Invalid time";
+    }
   };
 
   return (

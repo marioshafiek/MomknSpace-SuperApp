@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Box, Center, Spinner, Text } from "@chakra-ui/react";
 import axios from "axios";
 import ReportTable from "@components/AdminReport/ReportTable";
+import { useSearch } from "../SearchContext";
 
 interface Booking {
   _id: string;
@@ -38,6 +39,8 @@ const AdminReport: React.FC = () => {
   const [categories, setCategories] = useState<Category[]>([]);
   const [providers, setProviders] = useState<Provider[]>([]);
   const [loading, setLoading] = useState(true);
+
+  const { searchQuery } = useSearch();
 
   useEffect(() => {
     const fetchBookings = async () => {
@@ -128,6 +131,13 @@ const AdminReport: React.FC = () => {
     };
   });
 
+  const filteredData = reportData.filter(
+    (data) =>
+      data.customerName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      data.phoneNumber.includes(searchQuery) ||
+      data.service.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   const handleRemoveBooking = (id: string) => {
     setBookings((prevBookings) =>
       prevBookings.filter((booking) => booking._id !== id)
@@ -145,10 +155,13 @@ const AdminReport: React.FC = () => {
   return (
     <Box p={5}>
       <Text fontSize="2xl" fontWeight="bold" mb={5}>
-        Reports
+        Reports ({filteredData.length})
       </Text>
       <Box bg="white" p={5} rounded="lg" boxShadow="md" overflowX="auto">
-        <ReportTable data={reportData} onRemoveBooking={handleRemoveBooking} />
+        <ReportTable
+          data={filteredData}
+          onRemoveBooking={handleRemoveBooking}
+        />
       </Box>
     </Box>
   );

@@ -18,7 +18,6 @@ import {
 import ReportDetails from "@components/AdminReport/ReportDetails";
 import MainLayout from "src/layouts/MainLayout/MainLayout";
 import ErrorLayout from "../layouts/ErrorLayout";
-import DebugComponent from "@components/Debug";
 import PrivateRoute from "./PrivateRoute";
 import { AuthProvider } from "../contexts/AuthContext";
 
@@ -31,31 +30,18 @@ const router = createBrowserRouter([
       </PrivateRoute>
     ),
     children: [
-      { path: "/Home", element: <Home /> },
+      { path: "home", element: <Home /> },
       { path: "/", element: <Home /> },
-
-      { path: "/service-agent", element: <ServiceAgent /> },
-      { path: "/services", element: <Services /> },
-      {
-        path: "/category",
-        element: <ServicesCategory />,
-        children: [
-          {
-            path: ":categoryId",
-            element: <ServicesProvider />,
-            children: [
-              { path: "services", element: <Services /> },
-              { path: "service-agent", element: <ServiceAgent /> },
-            ],
-          },
-        ],
-      },
-      { path: "/admin/category", element: <AdminCategory /> },
-      { path: "/admin/providers", element: <AdminProviders /> },
-      { path: "/admin/services", element: <AdminServices /> },
-      { path: "/admin/agent", element: <AdminAgent /> },
-      { path: "/admin/reports", element: <AdminReports /> },
-      { path: "/admin/report/details/:id", element: <ReportDetails /> },
+      { path: "service-agent", element: <ServiceAgent /> },
+      { path: "services/:providerId", element: <Services /> },
+      { path: "category", element: <ServicesCategory /> },
+      { path: "category/:categoryId/providers", element: <ServicesProvider /> },
+      { path: "admin/category", element: <AdminCategory /> },
+      { path: "admin/providers", element: <AdminProviders /> },
+      { path: "admin/services", element: <AdminServices /> },
+      { path: "admin/agent", element: <AdminAgent /> },
+      { path: "admin/reports", element: <AdminReports /> },
+      { path: "admin/report/details/:id", element: <ReportDetails /> },
     ],
   },
   { path: "/login", element: <Login /> },

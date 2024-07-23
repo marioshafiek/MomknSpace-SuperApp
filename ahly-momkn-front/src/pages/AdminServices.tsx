@@ -6,6 +6,7 @@ import TablePagination from "@components/AdminCateogry/TablePagination";
 import ServicesModal from "@components/AdminServices/ServiceModal";
 import { Service } from "../types"; // Make sure this is correct
 import Swal from "sweetalert2";
+import { useSearch } from "../SearchContext";
 
 interface Provider {
   id: string;
@@ -62,6 +63,7 @@ const AdminServices: React.FC = () => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [editService, setEditService] = useState<Service | null>(null);
+  const { searchQuery } = useSearch();
   const itemsPerPage = 8;
 
   const fetchProvidersAndCategories = async () => {
@@ -144,6 +146,14 @@ const AdminServices: React.FC = () => {
     currentPage * itemsPerPage
   );
 
+  const filteredData = services.filter(
+    (service) =>
+      service.serviceName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      service.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      service.provider.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      service.category.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   const handleSave = () => {
     fetchServices();
     setIsModalOpen(false);
@@ -198,7 +208,7 @@ const AdminServices: React.FC = () => {
       ) : (
         <Box bg="white" p={5} rounded="lg" boxShadow="md" overflowX="auto">
           <ServicesTable
-            data={currentData}
+            data={filteredData}
             columns={[
               "Service",
               "Description",

@@ -19,7 +19,6 @@ import {
   Input,
   Stack,
   useColorModeValue,
-  Divider,
 } from "@chakra-ui/react";
 import { AddIcon, MinusIcon } from "@chakra-ui/icons";
 
@@ -29,6 +28,7 @@ interface ReserveModalProps {
   title: string;
   description: string;
   serviceFees: number;
+  type: string;
   onReserve: (selectedTime: string, selectedDate: string) => void;
 }
 
@@ -38,16 +38,16 @@ const ReserveModal: React.FC<ReserveModalProps> = ({
   title,
   description,
   serviceFees,
+  type,
   onReserve,
 }) => {
   const [selectedTime, setSelectedTime] = useState<string | undefined>();
   const [selectedDate, setSelectedDate] = useState<string | undefined>();
 
   const handleReserve = () => {
-    if (selectedTime && selectedDate) {
-      onReserve(selectedTime, selectedDate);
-      onClose();
-    }
+    onReserve(selectedTime || "", selectedDate || "");
+    console.log(type);
+    onClose();
   };
 
   const bgClosed = "#06B47933";
@@ -95,87 +95,91 @@ const ReserveModal: React.FC<ReserveModalProps> = ({
               )}
             </AccordionItem>
 
-            <AccordionItem border="none">
-              {({ isExpanded }) => (
-                <>
-                  <Box
-                    borderRadius="lg"
-                    bg={isExpanded ? bgOpen : bgClosed}
-                    _hover={{ bg: bgClosed }}
-                    mb={4}
-                    overflow="hidden"
-                  >
-                    <AccordionButton
-                      p={4}
-                      borderRadius="lg"
-                      _expanded={{ bg: bgClosed }}
-                    >
-                      {isExpanded ? (
-                        <MinusIcon fontSize="12px" mr={2} />
-                      ) : (
-                        <AddIcon fontSize="12px" mr={2} />
-                      )}
-                      <Box flex="1" textAlign="left">
-                        Select Time
+            {type === "scheduled" && (
+              <>
+                <AccordionItem border="none">
+                  {({ isExpanded }) => (
+                    <>
+                      <Box
+                        borderRadius="lg"
+                        bg={isExpanded ? bgOpen : bgClosed}
+                        _hover={{ bg: bgClosed }}
+                        mb={4}
+                        overflow="hidden"
+                      >
+                        <AccordionButton
+                          p={4}
+                          borderRadius="lg"
+                          _expanded={{ bg: bgClosed }}
+                        >
+                          {isExpanded ? (
+                            <MinusIcon fontSize="12px" mr={2} />
+                          ) : (
+                            <AddIcon fontSize="12px" mr={2} />
+                          )}
+                          <Box flex="1" textAlign="left">
+                            Select Time
+                          </Box>
+                        </AccordionButton>
+                        <AccordionPanel pb={4}>
+                          <Stack direction="row" spacing={4}>
+                            {["10-12", "12-2", "2-4"].map((time) => (
+                              <Button
+                                key={time}
+                                onClick={() => setSelectedTime(time)}
+                                colorScheme={
+                                  selectedTime === time ? "teal" : "gray"
+                                }
+                              >
+                                {time}
+                              </Button>
+                            ))}
+                          </Stack>
+                        </AccordionPanel>
                       </Box>
-                    </AccordionButton>
-                    <AccordionPanel pb={4}>
-                      <Stack direction="row" spacing={4}>
-                        {["10-12", "12-2", "2-4"].map((time) => (
-                          <Button
-                            key={time}
-                            onClick={() => setSelectedTime(time)}
-                            colorScheme={
-                              selectedTime === time ? "teal" : "gray"
-                            }
-                          >
-                            {time}
-                          </Button>
-                        ))}
-                      </Stack>
-                    </AccordionPanel>
-                  </Box>
-                </>
-              )}
-            </AccordionItem>
+                    </>
+                  )}
+                </AccordionItem>
 
-            <AccordionItem border="none">
-              {({ isExpanded }) => (
-                <>
-                  <Box
-                    borderRadius="lg"
-                    bg={isExpanded ? bgOpen : bgClosed}
-                    _hover={{ bg: bgClosed }}
-                    mb={4}
-                    overflow="hidden"
-                  >
-                    <AccordionButton
-                      p={4}
-                      borderRadius="lg"
-                      _expanded={{ bg: bgClosed }}
-                    >
-                      {isExpanded ? (
-                        <MinusIcon fontSize="12px" mr={2} />
-                      ) : (
-                        <AddIcon fontSize="12px" mr={2} />
-                      )}
-                      <Box flex="1" textAlign="left">
-                        Select Date
+                <AccordionItem border="none">
+                  {({ isExpanded }) => (
+                    <>
+                      <Box
+                        borderRadius="lg"
+                        bg={isExpanded ? bgOpen : bgClosed}
+                        _hover={{ bg: bgClosed }}
+                        mb={4}
+                        overflow="hidden"
+                      >
+                        <AccordionButton
+                          p={4}
+                          borderRadius="lg"
+                          _expanded={{ bg: bgClosed }}
+                        >
+                          {isExpanded ? (
+                            <MinusIcon fontSize="12px" mr={2} />
+                          ) : (
+                            <AddIcon fontSize="12px" mr={2} />
+                          )}
+                          <Box flex="1" textAlign="left">
+                            Select Date
+                          </Box>
+                        </AccordionButton>
+                        <AccordionPanel pb={4}>
+                          <FormControl>
+                            <FormLabel>Date</FormLabel>
+                            <Input
+                              type="date"
+                              onChange={(e) => setSelectedDate(e.target.value)}
+                            />
+                          </FormControl>
+                        </AccordionPanel>
                       </Box>
-                    </AccordionButton>
-                    <AccordionPanel pb={4}>
-                      <FormControl>
-                        <FormLabel>Date</FormLabel>
-                        <Input
-                          type="date"
-                          onChange={(e) => setSelectedDate(e.target.value)}
-                        />
-                      </FormControl>
-                    </AccordionPanel>
-                  </Box>
-                </>
-              )}
-            </AccordionItem>
+                    </>
+                  )}
+                </AccordionItem>
+              </>
+            )}
           </Accordion>
         </ModalBody>
 
@@ -183,13 +187,7 @@ const ReserveModal: React.FC<ReserveModalProps> = ({
           <Button variant="ghost" onClick={onClose}>
             Discard
           </Button>
-          <Button
-            bg={"#06B479"}
-            color={"white"}
-            ml={3}
-            onClick={handleReserve}
-            isDisabled={!selectedTime || !selectedDate}
-          >
+          <Button bg={"#06B479"} color={"white"} ml={3} onClick={handleReserve}>
             Reserve
           </Button>
         </ModalFooter>
