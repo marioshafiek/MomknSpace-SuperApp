@@ -28,7 +28,7 @@ Setup
 
 bash
 Copy code
-git clone https://github.com/yourusername/ahly-momkn-super-app.git
+git clone https://github.com/marioshafiek/ahly-momkn-super-app.git
 cd ahly-momkn-super-app
 Install Dependencies:
 
