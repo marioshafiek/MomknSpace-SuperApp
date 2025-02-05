@@ -54,6 +54,8 @@ yarn start
 The app should now be running on http://localhost:3000.
 
 ## Usage
+email: spaceadmin@gmail.com
+password: admin123
 Booking Services
 Navigate to the service booking section.
 Select the service you want to book.
